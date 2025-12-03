@@ -1,0 +1,16 @@
+extends Area3D
+
+@export var speed: float = 4.0
+var direction: Vector3 = Vector3.ZERO
+#detect if player hits an obstacle so Game Over
+func _ready() -> void:
+	add_to_group("obstacle")
+	
+func _physics_process(delta: float) -> void:
+	var pos := global_transform.origin
+	pos += direction * speed * delta
+	pos.y = 0.0
+	global_transform.origin = pos
+	#if they move too far off screen
+	if pos.length() > 80.0:
+		queue_free()
