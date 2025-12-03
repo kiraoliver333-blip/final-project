@@ -1,0 +1,35 @@
+extends CharacterBody3D
+
+@export var speed: float = 6.0
+
+func _physics_process(delta: float) -> void:
+	var input_vec = Vector3.ZERO
+#this to read player movement input from keyboard arrows
+	input_vec.x = Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+	input_vec.z = Input.get_action_strength("move_up") - Input.get_action_strength("move_down")
+	if input_vec != Vector3.ZERO:
+		input_vec = input_vec.normalized()
+	velocity.x = input_vec.x * speed
+	velocity.z = input_vec.z * speed
+	velocity.y = 0.0
+	
+	move_and_slide()
+	global_transform.origin.y = 0.0
+	
+func _on_hitbox_body_entered(body: Node3D) -> void:
+	if body.is_in_group("obstacle"):
+		_game_over()
+
+
+func _on_hitbox_area_entered(area: Area3D) -> void:
+	if area.is_in_group("obstacle"):
+		_win()
+
+func _game_over() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://game_over.tscn")
+
+func _win() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://congrats_win.tscn")
+	
