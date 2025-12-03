@@ -1,0 +1,34 @@
+extends Node3D
+
+@export var enemy_scene: PackedScene
+@export var spawn_radius: float = 18.0
+@export var enemy_speed: float = 4.0
+
+func _ready() -> void:
+	randomize()
+	$Timer.timeout.connect(_on_spawn_timer_timeout)
+	
+func _on_spawn_timer_timeout() -> void:
+	if enemy_scene == null:
+		return
+	var enemy: Area3D = enemy_scene.instantiate()
+	add_child(enemy)
+	
+	#start surroouding player when game starts
+	var angle := randf() * TAU
+	var pos := Vector3(cos(angle) * spawn_radius, 0.0, sin(angle) * spawn_radius )
+	enemy.global_transform.origin = pos
+	
+	#start making them move toward player
+	var player := $player
+	if player:
+		var direction := pos.direction_to(player.global_transform.origin)
+		enemy.direction = direction
+		enemy.speed = enemy_speed
+
+
+
+func _on_finishline_body_entered(body: Node3D) -> void:
+	if body == $player:
+		get_tree().change_scene_to_file("res://congrats_win.tscn")
+	
